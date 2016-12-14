@@ -1,7 +1,6 @@
-package org.apache.kafka;
+package is.sourcery.jms.monitoring;
 
 import javax.jms.JMSException;
-import javax.jms.Queue;
 import javax.jms.Topic;
 
 /**
@@ -9,8 +8,8 @@ import javax.jms.Topic;
  */
 public class TopicSubscriber<T extends javax.jms.TopicSubscriber> extends MessageConsumer<T> implements javax.jms.TopicSubscriber {
 
-    public TopicSubscriber(T topicSubscriber){
-        super(topicSubscriber);
+    public TopicSubscriber(Session session, T topicSubscriber){
+        super(session, topicSubscriber);
     }
 
     public Topic getTopic() throws JMSException {

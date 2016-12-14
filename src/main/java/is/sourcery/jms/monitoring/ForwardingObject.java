@@ -1,4 +1,4 @@
-package org.apache.kafka;
+package is.sourcery.jms.monitoring;
 
 public abstract class ForwardingObject<T> {
 

@@ -1,8 +1,6 @@
-package org.apache.kafka;
+package is.sourcery.jms.monitoring;
 
 import javax.jms.*;
-import javax.jms.Connection;
-import javax.jms.JMSProducer;
 import java.io.Serializable;
 
 /**
@@ -10,15 +8,22 @@ import java.io.Serializable;
  */
 public class JMSContext<T extends javax.jms.JMSContext> extends ForwardingObject<T> implements javax.jms.JMSContext {
 
-    public JMSContext(T jmsContext){
+    private is.sourcery.jms.monitoring.ConnectionFactory connectionFactory;
+
+    public JMSContext(is.sourcery.jms.monitoring.ConnectionFactory connectionFactory, T jmsContext){
         super(jmsContext);
+        this.connectionFactory = connectionFactory;
+    }
+    
+    public is.sourcery.jms.monitoring.ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
     }
 
     public javax.jms.JMSContext createContext(int sessionMode) {
-        return new JMSContext(delegate().createContext(sessionMode));
+        return new JMSContext(connectionFactory, delegate().createContext(sessionMode));
     }
 
-    public JMSProducer createProducer() {
+    public javax.jms.JMSProducer createProducer() {
         return delegate().createProducer();
     }
 
@@ -114,15 +119,15 @@ public class JMSContext<T extends javax.jms.JMSContext> extends ForwardingObject
         delegate().recover();
     }
 
-    public JMSConsumer createConsumer(Destination destination) {
+    public javax.jms.JMSConsumer createConsumer(Destination destination) {
         return delegate().createConsumer(destination);
     }
 
-    public JMSConsumer createConsumer(Destination destination, String messageSelector) {
+    public javax.jms.JMSConsumer createConsumer(Destination destination, String messageSelector) {
         return delegate().createConsumer(destination, messageSelector);
     }
 
-    public JMSConsumer createConsumer(Destination destination, String messageSelector, boolean noLocal) {
+    public javax.jms.JMSConsumer createConsumer(Destination destination, String messageSelector, boolean noLocal) {
         return delegate().createConsumer(destination, messageSelector, noLocal);
     }
 
@@ -134,28 +139,28 @@ public class JMSContext<T extends javax.jms.JMSContext> extends ForwardingObject
         return delegate().createTopic(topicName);
     }
 
-    public JMSConsumer createDurableConsumer(Topic topic, String name) {
-        return delegate().createDurableConsumer(topic, name);
+    public javax.jms.JMSConsumer createDurableConsumer(Topic topic, String subscriptionName) {
+        return delegate().createDurableConsumer(topic, subscriptionName);
     }
 
-    public JMSConsumer createDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal) {
-        return delegate().createDurableConsumer(topic, name, messageSelector, noLocal);
+    public javax.jms.JMSConsumer createDurableConsumer(Topic topic, String subscriptionName, String messageSelector, boolean noLocal) {
+        return delegate().createDurableConsumer(topic, subscriptionName, messageSelector, noLocal);
     }
 
-    public JMSConsumer createSharedDurableConsumer(Topic topic, String name) {
-        return delegate().createSharedDurableConsumer(topic, name);
+    public javax.jms.JMSConsumer createSharedDurableConsumer(Topic topic, String subscriptionName) {
+        return delegate().createSharedDurableConsumer(topic, subscriptionName);
     }
 
-    public JMSConsumer createSharedDurableConsumer(Topic topic, String name, String messageSelector) {
-        return delegate().createSharedDurableConsumer(topic, name, messageSelector);
+    public javax.jms.JMSConsumer createSharedDurableConsumer(Topic topic, String subscriptionName, String messageSelector) {
+        return delegate().createSharedDurableConsumer(topic, subscriptionName, messageSelector);
     }
 
-    public JMSConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName) {
-        return delegate().createSharedConsumer(topic, sharedSubscriptionName);
+    public javax.jms.JMSConsumer createSharedConsumer(Topic topic, String subscriptionName) {
+        return delegate().createSharedConsumer(topic, subscriptionName);
     }
 
-    public JMSConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName, String messageSelector) {
-        return delegate().createSharedConsumer(topic, sharedSubscriptionName, messageSelector);
+    public javax.jms.JMSConsumer createSharedConsumer(Topic topic, String subscriptionName, String messageSelector) {
+        return delegate().createSharedConsumer(topic, subscriptionName, messageSelector);
     }
 
     public QueueBrowser createBrowser(Queue queue) {

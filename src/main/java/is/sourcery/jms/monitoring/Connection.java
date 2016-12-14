@@ -1,4 +1,4 @@
-package org.apache.kafka;
+package is.sourcery.jms.monitoring;
 
 import javax.jms.*;
 
@@ -7,8 +7,15 @@ import javax.jms.*;
  */
 public class Connection<T extends javax.jms.Connection> extends ForwardingObject<T> implements javax.jms.Connection {
 
-    public Connection(T connection){
+    private ConnectionFactory connectionFactory;
+    
+    public Connection(ConnectionFactory connectionFactory, T connection){
         super(connection);
+        this.connectionFactory = connectionFactory;
+    }
+    
+    public ConnectionFactory getConnectionFactory(){
+        return connectionFactory;
     }
 
     public javax.jms.Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {

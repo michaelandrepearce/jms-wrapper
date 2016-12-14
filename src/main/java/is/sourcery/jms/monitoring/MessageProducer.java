@@ -1,14 +1,36 @@
-package org.apache.kafka;
+package is.sourcery.jms.monitoring;
 
 import javax.jms.*;
+
+import is.sourcery.jms.monitoring.intercept.*;
 
 /**
  * Created by michaelandrepearce on 12/12/2016.
  */
 public class MessageProducer<T extends javax.jms.MessageProducer> extends ForwardingObject<T> implements javax.jms.MessageProducer {
 
-    public MessageProducer(T messageProducer){
+    private Session session;
+    private ProducerInterceptor producerInterceptor;
+    private String clientId;
+
+    public MessageProducer(Session session, T messageProducer){
         super(messageProducer);
+        this.session = session;
+        this.producerInterceptor = session.getConnection().getConnectionFactory().getProducerInterceptor();
+        try {
+            this.clientId = session.getConnection().getClientID();
+        } catch (JMSException e) {
+            throw JmsExceptionUtils.convertToRuntimeException(e);
+        }
+    }
+
+    public Message intercept(Destination destination, Message message) throws JMSException {
+        destination = destination == null ? getDestination() : destination;
+        return producerInterceptor == null ? message : producerInterceptor.onIntercept(clientId, destination, message);
+    }
+
+    public Session getSession(){
+        return session;
     }
 
     public void setDisableMessageID(boolean value) throws JMSException {
@@ -68,34 +90,34 @@ public class MessageProducer<T extends javax.jms.MessageProducer> extends Forwar
     }
 
     public void send(Message message) throws JMSException {
-        delegate().send(message);
+        delegate().send(intercept(null, message));
     }
 
     public void send(Message message, int deliveryMode, int priority, long timeToLive) throws JMSException {
-        delegate().send(message, deliveryMode, priority, timeToLive);
+        delegate().send(intercept(null, message), deliveryMode, priority, timeToLive);
     }
 
     public void send(Destination destination, Message message) throws JMSException {
-        delegate().send(destination, message);
+        delegate().send(destination, intercept(destination, message));
     }
 
     public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive) throws JMSException {
-        delegate().send(destination, message, deliveryMode, priority, timeToLive);
+        delegate().send(destination, intercept(destination, message), deliveryMode, priority, timeToLive);
     }
 
     public void send(Message message, CompletionListener completionListener) throws JMSException {
-        delegate().send(message, completionListener);
+        delegate().send(intercept(null, message), completionListener);
     }
 
     public void send(Message message, int deliveryMode, int priority, long timeToLive, CompletionListener completionListener) throws JMSException {
-        delegate().send(message, deliveryMode, priority, timeToLive, completionListener);
+        delegate().send(intercept(null, message), deliveryMode, priority, timeToLive, completionListener);
     }
 
     public void send(Destination destination, Message message, CompletionListener completionListener) throws JMSException {
-        delegate().send(destination, message, completionListener);
+        delegate().send(destination, intercept(destination, message), completionListener);
     }
 
     public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive, CompletionListener completionListener) throws JMSException {
-        delegate().send(destination, message, deliveryMode, priority, timeToLive, completionListener);
+        delegate().send(destination, intercept(destination, message), deliveryMode, priority, timeToLive, completionListener);
     }
 }

@@ -1,4 +1,4 @@
-package org.apache.kafka;
+package is.sourcery.jms.monitoring;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -9,8 +9,8 @@ import javax.jms.Queue;
  */
 public class QueueSender<T extends javax.jms.QueueSender> extends MessageProducer<T> implements javax.jms.QueueSender {
 
-    public QueueSender(T queueSender){
-        super(queueSender);
+    public QueueSender(Session session, T queueSender){
+        super(session, queueSender);
     }
 
     public Queue getQueue() throws JMSException {

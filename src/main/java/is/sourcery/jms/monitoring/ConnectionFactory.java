@@ -1,14 +1,22 @@
-package org.apache.kafka;
+package is.sourcery.jms.monitoring;
 
 import javax.jms.Connection;
 import javax.jms.JMSContext;
 import javax.jms.JMSException;
+
+import is.sourcery.jms.monitoring.intercept.ConsumerInterceptor;
+import is.sourcery.jms.monitoring.intercept.NoOpConsumerInterceptor;
+import is.sourcery.jms.monitoring.intercept.NoOpProducerInterceptor;
+import is.sourcery.jms.monitoring.intercept.ProducerInterceptor;
 
 /**
  * Created by michaelandrepearce on 12/12/2016.
  */
 public class ConnectionFactory<T extends javax.jms.ConnectionFactory> extends ForwardingObject<T> implements javax.jms.ConnectionFactory {
 
+    private ProducerInterceptor producerInterceptor;
+    private ConsumerInterceptor consumerInterceptor;
+    
     public ConnectionFactory(T connectionFactory){
         super(connectionFactory);
     }
@@ -37,4 +45,23 @@ public class ConnectionFactory<T extends javax.jms.ConnectionFactory> extends Fo
         return delegate().createContext(sessionMode);
     }
 
+    public ProducerInterceptor getProducerInterceptor()
+    {
+        return producerInterceptor == null ? NoOpProducerInterceptor.getInstance() : producerInterceptor;
+    }
+
+    public ConsumerInterceptor getConsumerInterceptor()
+    {
+        return consumerInterceptor == null ? NoOpConsumerInterceptor.getInstance() : consumerInterceptor;
+    }
+
+    public void setConsumerInterceptor(ConsumerInterceptor consumerInterceptor)
+    {
+        this.consumerInterceptor = consumerInterceptor;
+    }
+
+    public void setProducerInterceptor(ProducerInterceptor producerInterceptor)
+    {
+        this.producerInterceptor = producerInterceptor;
+    }
 }
